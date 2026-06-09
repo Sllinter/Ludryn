@@ -84,21 +84,21 @@ if (-not $certificate -or $certificate.NotAfter -lt (Get-Date).AddMonths(3)) {
 $certificatePath = Join-Path $certificateDirectory "Ludryn.cer"
 Export-Certificate -Cert $certificate -FilePath $certificatePath -Force | Out-Null
 
-$trustedCertificate = Get-ChildItem Cert:\CurrentUser\TrustedPeople |
-    Where-Object Thumbprint -eq $certificate.Thumbprint |
-    Select-Object -First 1
-if (-not $trustedCertificate) {
-    Import-Certificate -FilePath $certificatePath -CertStoreLocation Cert:\CurrentUser\TrustedPeople | Out-Null
-}
-
-$trustedRootCertificate = Get-ChildItem Cert:\CurrentUser\Root |
-    Where-Object Thumbprint -eq $certificate.Thumbprint |
-    Select-Object -First 1
-if (-not $trustedRootCertificate) {
-    Import-Certificate -FilePath $certificatePath -CertStoreLocation Cert:\CurrentUser\Root | Out-Null
-}
-
 if (-not $BuildOnly) {
+    $trustedCertificate = Get-ChildItem Cert:\CurrentUser\TrustedPeople |
+        Where-Object Thumbprint -eq $certificate.Thumbprint |
+        Select-Object -First 1
+    if (-not $trustedCertificate) {
+        Import-Certificate -FilePath $certificatePath -CertStoreLocation Cert:\CurrentUser\TrustedPeople | Out-Null
+    }
+
+    $trustedRootCertificate = Get-ChildItem Cert:\CurrentUser\Root |
+        Where-Object Thumbprint -eq $certificate.Thumbprint |
+        Select-Object -First 1
+    if (-not $trustedRootCertificate) {
+        Import-Certificate -FilePath $certificatePath -CertStoreLocation Cert:\CurrentUser\Root | Out-Null
+    }
+
     $machineRootCertificate = Get-ChildItem Cert:\LocalMachine\Root |
         Where-Object Thumbprint -eq $certificate.Thumbprint |
         Select-Object -First 1
