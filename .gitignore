@@ -1,0 +1,29 @@
+# Segredos e configuracoes locais
+keys.txt
+appsettings.json
+
+# Artefatos gerados
+artifacts/
+outputs/
+work/
+Installer/Ludryn.Installer/Payload/
+
+# Visual Studio e compilacao
+.vs/
+**/bin/
+**/obj/
+*.user
+*.suo
+*.cache
+
+# Pacotes e certificados gerados
+*.msix
+*.msixbundle
+*.appx
+*.appxbundle
+*.pfx
+*.cer
+
+# Logs locais
+Logs/
+*.log

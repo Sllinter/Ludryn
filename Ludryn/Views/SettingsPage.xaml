@@ -1,0 +1,101 @@
+<Page
+    x:Class="Ludryn.Views.SettingsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Background="{StaticResource BaseBackgroundBrush}">
+    <Grid>
+        <Rectangle Fill="#E8000000" />
+
+        <Grid Padding="128,70,128,178">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="138" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <StackPanel HorizontalAlignment="Center" Spacing="6">
+                <TextBlock Text="CONFIGURAÇÕES" Foreground="#F2C98E" FontFamily="Georgia" FontSize="60" FontWeight="Bold" />
+                <TextBlock Text="Preferências da Ludryn" Foreground="{StaticResource SecondaryTextBrush}" FontSize="20" HorizontalAlignment="Center" />
+            </StackPanel>
+
+            <Grid Grid.Row="1" ColumnSpacing="28">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="330" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <Border CornerRadius="8" Background="#B0101116" BorderBrush="#35FFFFFF" BorderThickness="1">
+                    <StackPanel Padding="10" Spacing="6">
+                        <Button x:Name="GeneralCategoryButton" Content="Geral" Click="Category_Click" Tag="0" Height="74" Style="{StaticResource SettingsCategoryButtonStyle}" />
+                        <Button x:Name="LibraryCategoryButton" Content="Biblioteca" Click="Category_Click" Tag="1" Height="74" Style="{StaticResource SettingsCategoryButtonStyle}" />
+                        <Button x:Name="SteamGridDbCategoryButton" Content="SteamGridDB" Click="Category_Click" Tag="2" Height="74" Style="{StaticResource SettingsCategoryButtonStyle}" />
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Column="1" CornerRadius="8" Background="#B0101116" BorderBrush="#35FFFFFF" BorderThickness="1">
+                    <Grid Padding="34,28">
+                        <Grid x:Name="GeneralPanel">
+                            <StackPanel Spacing="22">
+                                <TextBlock Text="Geral" Foreground="#F2C98E" FontFamily="Georgia" FontSize="38" FontWeight="Bold" />
+                                <Button x:Name="StartupPageButton" Click="StartupPage_Click" Height="96" Style="{StaticResource SettingsRowButtonStyle}">
+                                    <Grid Padding="20,12" ColumnSpacing="20">
+                                        <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="280" /></Grid.ColumnDefinitions>
+                                        <StackPanel VerticalAlignment="Center">
+                                            <TextBlock Text="Página inicial ao abrir" Foreground="White" FontSize="22" />
+                                            <TextBlock Text="Pressione A para alternar a tela inicial." Foreground="{StaticResource SecondaryTextBrush}" FontSize="15" />
+                                        </StackPanel>
+                                        <TextBlock x:Name="StartupPageText" Grid.Column="1" Foreground="#D875F0" FontSize="22" FontWeight="SemiBold" HorizontalAlignment="Right" VerticalAlignment="Center" />
+                                    </Grid>
+                                </Button>
+                            </StackPanel>
+                        </Grid>
+
+                        <Grid x:Name="LibraryPanel" Visibility="Collapsed">
+                            <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /><RowDefinition Height="*" /></Grid.RowDefinitions>
+                            <StackPanel Spacing="4">
+                                <TextBlock Text="Biblioteca" Foreground="#F2C98E" FontFamily="Georgia" FontSize="38" FontWeight="Bold" />
+                                <TextBlock Text="Pastas adicionais verificadas automaticamente ao abrir o app." Foreground="{StaticResource SecondaryTextBrush}" FontSize="16" />
+                            </StackPanel>
+                            <Button x:Name="AddGameDirectoryButton" Grid.Row="1" Click="AddGameDirectory_Click" Height="82" Margin="0,22,0,16" Style="{StaticResource SettingsRowButtonStyle}">
+                                <StackPanel Orientation="Horizontal" Spacing="16" HorizontalAlignment="Center">
+                                    <FontIcon Glyph="&#xE8B7;" FontFamily="Segoe MDL2 Assets" FontSize="27" Foreground="#D875F0" />
+                                    <TextBlock Text="Adicionar pasta de jogos" Foreground="White" FontSize="21" />
+                                </StackPanel>
+                            </Button>
+                            <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Hidden">
+                                <StackPanel x:Name="GameDirectoriesPanel" Spacing="10" />
+                            </ScrollViewer>
+                        </Grid>
+
+                        <Grid x:Name="SteamGridDbPanel" Visibility="Collapsed">
+                            <StackPanel Spacing="20">
+                                <StackPanel Spacing="4">
+                                    <TextBlock Text="SteamGridDB" Foreground="#F2C98E" FontFamily="Georgia" FontSize="38" FontWeight="Bold" />
+                                    <TextBlock Text="Chave oficial usada para baixar capas, fundos, letreiros e ícones." Foreground="{StaticResource SecondaryTextBrush}" FontSize="16" />
+                                </StackPanel>
+
+                                <TextBlock Text="API Key" Foreground="White" FontSize="20" FontWeight="SemiBold" />
+                                <Grid ColumnSpacing="10">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="64" />
+                                        <ColumnDefinition Width="132" />
+                                        <ColumnDefinition Width="132" />
+                                    </Grid.ColumnDefinitions>
+                                    <Button x:Name="ApiKeyEditButton" Click="ApiKeyEdit_Click" Height="64" Padding="0" Style="{StaticResource SettingsRowButtonStyle}">
+                                        <PasswordBox x:Name="SteamGridDbApiKeyBox" PasswordChanged="SteamGridDbApiKeyBox_PasswordChanged" LostFocus="SteamGridDbApiKeyBox_LostFocus" PlaceholderText="Cole sua API Key" IsHitTestVisible="False" PasswordRevealMode="Hidden" FontSize="18" Margin="10,0" />
+                                    </Button>
+                                    <Button x:Name="RevealApiKeyButton" Grid.Column="1" Click="RevealApiKey_Click" Height="64" ToolTipService.ToolTip="Mostrar ou esconder chave">
+                                        <FontIcon x:Name="RevealApiKeyIcon" Glyph="&#xE890;" FontFamily="Segoe MDL2 Assets" FontSize="22" />
+                                    </Button>
+                                    <Button x:Name="PasteApiKeyButton" Grid.Column="2" Click="PasteApiKey_Click" Content="Colar" Height="64" FontSize="18" />
+                                    <Button x:Name="CreateApiKeyButton" Grid.Column="3" Click="CreateApiKey_Click" Content="Criar" Height="64" FontSize="18" />
+                                </Grid>
+                                <TextBlock x:Name="SteamGridDbStatusText" Foreground="{StaticResource SecondaryTextBrush}" FontSize="16" TextWrapping="WrapWholeWords" />
+                            </StackPanel>
+                        </Grid>
+                    </Grid>
+                </Border>
+            </Grid>
+        </Grid>
+    </Grid>
+</Page>

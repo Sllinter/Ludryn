@@ -1,0 +1,11 @@
+﻿<Solution>
+  <Configurations>
+    <BuildType Name="Debug" />
+    <BuildType Name="Release" />
+    <Platform Name="x64" />
+  </Configurations>
+  <Project DefaultStartup="true" Path="Ludryn/Ludryn.csproj">
+    <Platform Project="x64" />
+    <Deploy Solution="Debug|x64" />
+  </Project>
+</Solution>

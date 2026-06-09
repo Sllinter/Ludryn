@@ -1,0 +1,53 @@
+name: Relatar um problema
+description: Informe um erro ou comportamento inesperado no Ludryn.
+title: "[Bug] "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Obrigado por ajudar a melhorar o Ludryn. Não publique chaves de API ou outros dados pessoais.
+  - type: input
+    id: version
+    attributes:
+      label: Versão do Ludryn
+      placeholder: "Ex.: 1.0.3.0"
+    validations:
+      required: true
+  - type: input
+    id: windows
+    attributes:
+      label: Versão do Windows
+      placeholder: "Ex.: Windows 11 24H2"
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: O que aconteceu?
+      description: Explique o problema e o resultado esperado.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Como reproduzir
+      placeholder: |
+        1. Abra...
+        2. Selecione...
+        3. Pressione...
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs e imagens
+      description: Arraste screenshots e arquivos de log para este campo.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Confirmações
+      options:
+        - label: Removi chaves de API e informações pessoais dos anexos.
+          required: true

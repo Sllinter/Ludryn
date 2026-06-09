@@ -1,0 +1,52 @@
+name: Build Ludryn Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Validate release version
+        shell: powershell
+        run: |
+          [xml]$manifest = Get-Content .\Ludryn\Package.appxmanifest
+          $manifestVersion = $manifest.Package.Identity.Version
+          $tagVersion = $env:GITHUB_REF_NAME.TrimStart("v")
+          if ($manifestVersion -ne $tagVersion) {
+            throw "A tag $tagVersion não corresponde ao manifesto $manifestVersion."
+          }
+
+      - name: Build installer
+        shell: powershell
+        run: .\Build-LudrynRelease.ps1
+
+      - name: Publish GitHub Release
+        shell: powershell
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $version = $env:GITHUB_REF_NAME.TrimStart("v")
+          $files = @(
+            ".\artifacts\Release\Ludryn-Setup.exe",
+            ".\artifacts\Release\Ludryn-Setup.exe.sha256",
+            ".\artifacts\Release\Ludryn-Setup-$version.exe",
+            ".\artifacts\Release\Ludryn-Setup-$version.exe.sha256"
+          )
+          gh release create $env:GITHUB_REF_NAME $files `
+            --title "Ludryn $version" `
+            --generate-notes

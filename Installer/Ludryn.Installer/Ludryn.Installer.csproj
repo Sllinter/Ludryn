@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <AssemblyName>Ludryn-Setup</AssemblyName>
+    <RootNamespace>Ludryn.Installer</RootNamespace>
+    <PublishSingleFile>true</PublishSingleFile>
+    <SelfContained>true</SelfContained>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Payload\Ludryn.msix" LogicalName="Ludryn.Payload.Ludryn.msix" />
+    <EmbeddedResource Include="Payload\WindowsAppRuntime.msix" LogicalName="Ludryn.Payload.WindowsAppRuntime.msix" />
+    <EmbeddedResource Include="Payload\Ludryn.cer" LogicalName="Ludryn.Payload.Ludryn.cer" />
+  </ItemGroup>
+</Project>

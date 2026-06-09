@@ -1,0 +1,229 @@
+﻿<Page
+    x:Class="Ludryn.Views.LibraryPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:models="using:Ludryn.Models"
+    Background="{StaticResource BaseBackgroundBrush}">
+    <Grid x:Name="PageRoot">
+        <Border Height="650" VerticalAlignment="Top">
+            <Grid>
+            <Image x:Name="BackgroundArt" Width="{Binding ActualWidth, ElementName=PageRoot}" Height="650" Stretch="UniformToFill" Opacity="0.78" HorizontalAlignment="Center" VerticalAlignment="Top" />
+            <Rectangle Fill="#70000000" />
+            <Rectangle>
+                <Rectangle.Fill>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                        <GradientStop Color="#00000000" Offset="0.52" />
+                        <GradientStop Color="#720D0D0F" Offset="0.72" />
+                        <GradientStop Color="#D80D0D0F" Offset="0.9" />
+                        <GradientStop Color="#FF0D0D0F" Offset="1" />
+                    </LinearGradientBrush>
+                </Rectangle.Fill>
+            </Rectangle>
+            </Grid>
+        </Border>
+
+        <Grid Padding="80,54,80,178">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="124" />
+                <RowDefinition Height="72" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <StackPanel>
+                <TextBlock Text="Biblioteca" Foreground="#F2C98E" FontFamily="Georgia" FontSize="54" FontWeight="Bold" />
+                <TextBlock x:Name="LibrarySubtitle" Text="Todos os jogos  •  22 itens" Foreground="{StaticResource PrimaryTextBrush}" FontSize="20" Opacity="0.88" />
+            </StackPanel>
+
+            <Grid Grid.Row="1" HorizontalAlignment="Center" Margin="0,-38,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="72" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="72" />
+                </Grid.ColumnDefinitions>
+
+                <Border Width="46" Height="34" CornerRadius="8" BorderBrush="#CC52EB" BorderThickness="1.5" Background="#5E5F1C6F" VerticalAlignment="Center" HorizontalAlignment="Left">
+                    <TextBlock Text="LT" Foreground="{StaticResource PrimaryTextBrush}" FontSize="17" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                </Border>
+
+                <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="18">
+                    <Button x:Name="AllFilterButton" Content="Todos" Tag="Todas" Click="FilterButton_Click" Style="{StaticResource FilterPillButtonStyle}" />
+                    <Button x:Name="FavoritesFilterButton" Content="Favoritos" Tag="Favoritos" Click="FilterButton_Click" Style="{StaticResource FilterPillButtonStyle}" />
+                    <Button x:Name="StoresFilterButton" Content="Lojas" Tag="Lojas" Click="FilterButton_Click" Style="{StaticResource FilterPillButtonStyle}" />
+                </StackPanel>
+
+                <Border Grid.Column="2" Width="46" Height="34" CornerRadius="8" BorderBrush="#CC52EB" BorderThickness="1.5" Background="#5E5F1C6F" VerticalAlignment="Center" HorizontalAlignment="Right">
+                    <TextBlock Text="RT" Foreground="{StaticResource PrimaryTextBrush}" FontSize="17" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                </Border>
+            </Grid>
+
+            <GridView x:Name="GamesGrid" Grid.Row="2" Width="1420" HorizontalAlignment="Center" SelectionMode="None" ItemContainerStyle="{StaticResource FlatGridViewItemStyle}" IsItemClickEnabled="True" ItemClick="GamesGrid_ItemClick" GotFocus="GamesGrid_GotFocus" ScrollViewer.VerticalScrollBarVisibility="Hidden" XYFocusKeyboardNavigation="Enabled">
+                <GridView.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="6" />
+                    </ItemsPanelTemplate>
+                </GridView.ItemsPanel>
+                <GridView.ItemTemplate>
+                    <DataTemplate x:DataType="models:Game">
+                        <Grid x:Name="LibraryGameSlot" GotFocus="GameCard_GotFocus" LostFocus="GameCard_LostFocus" IsTabStop="True" Width="{x:Bind LibrarySlotWidth}" Height="{x:Bind LibrarySlotHeight}">
+                            <Grid x:Name="LibraryGameCard" Width="{x:Bind LibraryCardWidth}" Height="{x:Bind LibraryCardHeight}" HorizontalAlignment="Center" VerticalAlignment="Center" RenderTransformOrigin="0.5,0.5">
+                                <Grid.RenderTransform>
+                                    <CompositeTransform ScaleX="1" ScaleY="1" TranslateY="0" />
+                                </Grid.RenderTransform>
+                                <Border CornerRadius="16" BorderBrush="#2AFFFFFF" BorderThickness="1" Visibility="{x:Bind GameEntryVisibility}">
+                                    <Border.Background>
+                                        <ImageBrush ImageSource="{x:Bind CoverArt, Mode=OneWay}" Stretch="UniformToFill" />
+                                    </Border.Background>
+                                </Border>
+                                <Border CornerRadius="16" Background="#3D000000" Margin="1" Visibility="{x:Bind GameEntryVisibility}" />
+                                <Grid Visibility="{x:Bind StoreEntryVisibility}" Width="164" Height="164" Background="Transparent" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,8,0,0">
+                                    <Image Source="{x:Bind LibraryPlatformIcon, Mode=OneWay}" Width="{x:Bind StoreIconSize}" Height="{x:Bind StoreIconSize}" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                </Grid>
+                                <StackPanel Visibility="{x:Bind StoreEntryVisibility}" HorizontalAlignment="Center" VerticalAlignment="Bottom" Width="188" Spacing="4" Margin="0,0,0,8">
+                                    <TextBlock Text="{x:Bind Title}" Foreground="White" FontSize="18" FontWeight="Bold" TextAlignment="Center" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" MaxLines="1" />
+                                    <TextBlock Text="{x:Bind StoreStatusText}" Foreground="{StaticResource SecondaryTextBrush}" FontSize="14" TextAlignment="Center" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" MaxLines="1" />
+                                </StackPanel>
+                                <StackPanel VerticalAlignment="Bottom" Margin="14" Spacing="5" Visibility="{x:Bind GameEntryVisibility}">
+                                    <TextBlock Text="{x:Bind Title}" Visibility="{x:Bind CardTitleVisibility, Mode=OneWay}" Foreground="White" TextWrapping="WrapWholeWords" FontSize="18" FontWeight="Bold" MaxLines="2" />
+                                    <StackPanel Orientation="Horizontal" Spacing="6">
+                                        <Image Source="{x:Bind LibraryPlatformIcon, Mode=OneWay}" Width="34" Height="34" Stretch="Uniform" />
+                                    </StackPanel>
+                                </StackPanel>
+                            </Grid>
+                        </Grid>
+                    </DataTemplate>
+                </GridView.ItemTemplate>
+            </GridView>
+            <Border x:Name="EmptyStatePanel" Grid.Row="2" Visibility="Collapsed" Width="720" HorizontalAlignment="Center" VerticalAlignment="Center" CornerRadius="16" Padding="30" Background="#B0101216" BorderBrush="#35FFFFFF" BorderThickness="1">
+                <StackPanel Spacing="10">
+                    <TextBlock Text="Nenhum jogo baixado encontrado" Foreground="White" FontSize="30" FontWeight="SemiBold" TextAlignment="Center" />
+                    <TextBlock Text="A Ludryn procura jogos instalados na Steam, Epic e ROMs configuradas em Emuladores." Foreground="{StaticResource SecondaryTextBrush}" FontSize="18" TextWrapping="WrapWholeWords" TextAlignment="Center" />
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <StackPanel HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,188,122,0" Spacing="6">
+            <TextBlock Text="Ordenar por" Foreground="{StaticResource SecondaryTextBrush}" FontSize="15" HorizontalAlignment="Right" />
+            <Border CornerRadius="18" Padding="14,7" Background="#A017151A" BorderBrush="#35FFFFFF" BorderThickness="1">
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                    <Border Width="24" Height="24" CornerRadius="12" BorderBrush="#00A8FF" BorderThickness="1">
+                        <TextBlock Text="X" Foreground="#00A8FF" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" FontSize="12" />
+                    </Border>
+                    <TextBlock x:Name="CurrentSortText" Text="Mais recentes" Foreground="{StaticResource PrimaryTextBrush}" FontSize="17" VerticalAlignment="Center" />
+                </StackPanel>
+            </Border>
+        </StackPanel>
+
+        <Grid x:Name="SortOverlay" Visibility="Collapsed" Background="#A0000000">
+            <Border Width="480" CornerRadius="18" Padding="28" Background="#EC111018" BorderBrush="#B65FF1FF" BorderThickness="1.5" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <StackPanel Spacing="18">
+                    <TextBlock Text="Ordenar por" Foreground="#F2C98E" FontFamily="Georgia" FontSize="36" FontWeight="Bold" />
+                    <StackPanel x:Name="SortOptionsPanel" Spacing="10">
+                        <Button x:Name="SortRecentButton" Content="Mais recentes" Tag="Recentes" Click="SortButton_Click" Style="{StaticResource FilterPillButtonStyle}" HorizontalAlignment="Stretch" />
+                        <Button x:Name="SortMostPlayedButton" Content="Mais jogados" Tag="MaisJogados" Click="SortButton_Click" Style="{StaticResource FilterPillButtonStyle}" HorizontalAlignment="Stretch" />
+                        <Button x:Name="SortAlphabeticalButton" Content="A-Z" Tag="AZ" Click="SortButton_Click" Style="{StaticResource FilterPillButtonStyle}" HorizontalAlignment="Stretch" />
+                        <Button x:Name="SortAddedButton" Content="Adicionados recentemente" Tag="Adicionados" Click="SortButton_Click" Style="{StaticResource FilterPillButtonStyle}" HorizontalAlignment="Stretch" />
+                        <Button x:Name="SortPlatformButton" Content="Por plataforma" Tag="Plataforma" Click="SortButton_Click" Style="{StaticResource FilterPillButtonStyle}" HorizontalAlignment="Stretch" />
+                    </StackPanel>
+                    <TextBlock Text="A Selecionar   B Voltar" Foreground="{StaticResource SecondaryTextBrush}" FontSize="15" HorizontalAlignment="Center" />
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <Grid x:Name="AddOverlay" Visibility="Collapsed" Background="#A0000000">
+            <Border Width="560" CornerRadius="18" Padding="30" Background="#EC111018" BorderBrush="#B65FF1FF" BorderThickness="1.5" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <StackPanel Spacing="18">
+                    <TextBlock Text="Adicionar à biblioteca" Foreground="#F2C98E" FontFamily="Georgia" FontSize="36" FontWeight="Bold" />
+                    <StackPanel x:Name="AddOptionsPanel" Spacing="12">
+                        <Button x:Name="AddComputerGameButton" Click="AddComputerGame_Click" Style="{StaticResource SettingsRowButtonStyle}" HorizontalAlignment="Stretch" Padding="0">
+                            <Grid Padding="22,18">
+                                <StackPanel Spacing="5">
+                                    <TextBlock Text="Adicionar jogo do computador" Foreground="White" FontSize="23" FontWeight="SemiBold" />
+                                    <TextBlock Text="Selecione o executável de um jogo instalado fora das lojas." Foreground="{StaticResource SecondaryTextBrush}" FontSize="15" TextWrapping="WrapWholeWords" />
+                                </StackPanel>
+                            </Grid>
+                        </Button>
+                        <Button x:Name="AddAppButton" Click="AddApp_Click" Style="{StaticResource SettingsRowButtonStyle}" HorizontalAlignment="Stretch" Padding="0">
+                            <Grid Padding="22,18">
+                                <StackPanel Spacing="5">
+                                    <TextBlock Text="Adicionar app" Foreground="White" FontSize="23" FontWeight="SemiBold" />
+                                    <TextBlock Text="Selecione o executável de uma loja ou aplicativo externo." Foreground="{StaticResource SecondaryTextBrush}" FontSize="15" TextWrapping="WrapWholeWords" />
+                                </StackPanel>
+                            </Grid>
+                        </Button>
+                    </StackPanel>
+                    <TextBlock Text="A Selecionar   B Voltar" Foreground="{StaticResource SecondaryTextBrush}" FontSize="15" HorizontalAlignment="Center" />
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <Grid x:Name="ProgramBrowserOverlay" Visibility="Collapsed" Background="#F207090D" Padding="72,48,72,150">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <StackPanel>
+                <TextBlock x:Name="ProgramBrowserTitle" Text="Adicionar jogo do computador" Foreground="#F2C98E" FontFamily="Georgia" FontSize="46" FontWeight="Bold" />
+                <TextBlock Text="Programas encontrados no Menu Iniciar e na Área de Trabalho" Foreground="{StaticResource SecondaryTextBrush}" FontSize="18" />
+            </StackPanel>
+            <Grid Grid.Row="1" Margin="0,22,0,20">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="300" />
+                </Grid.ColumnDefinitions>
+                <Border x:Name="ProgramSearchSelectionBorder" Height="58" CornerRadius="8" BorderBrush="#45FFFFFF" BorderThickness="1" Background="#C5121218" Padding="18,0">
+                    <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+                        <Border Width="28" Height="28" CornerRadius="14" BorderBrush="#FFD800" BorderThickness="1.5">
+                            <TextBlock Text="Y" Foreground="#FFD800" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <TextBox x:Name="ProgramSearchBox"
+                                 Width="760"
+                                 PlaceholderText="Pesquisar por nome"
+                                 Foreground="White"
+                                 Background="Transparent"
+                                 BorderThickness="0"
+                                 FontSize="19"
+                                 VerticalAlignment="Center"
+                                 TextChanged="ProgramSearchBox_TextChanged">
+                            <TextBox.InputScope>
+                                <InputScope>
+                                    <InputScope.Names>
+                                        <InputScopeName NameValue="Search" />
+                                    </InputScope.Names>
+                                </InputScope>
+                            </TextBox.InputScope>
+                        </TextBox>
+                    </StackPanel>
+                </Border>
+                <Button x:Name="BrowseComputerButton"
+                        Grid.Column="1"
+                        Content="Buscar do computador"
+                        Click="BrowseComputer_Click"
+                        Margin="16,0,0,0"
+                        FontSize="18"
+                        BorderThickness="1" />
+            </Grid>
+            <GridView x:Name="ProgramGrid" Grid.Row="2" SelectionMode="Single" IsItemClickEnabled="True" ItemClick="ProgramGrid_ItemClick" ItemContainerStyle="{StaticResource FlatGridViewItemStyle}" ScrollViewer.VerticalScrollBarVisibility="Hidden">
+                <GridView.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5" />
+                    </ItemsPanelTemplate>
+                </GridView.ItemsPanel>
+                <GridView.ItemTemplate>
+                    <DataTemplate x:DataType="models:ComputerProgramEntry">
+                        <Border Width="320" Height="116" Margin="8" Padding="18" CornerRadius="8" BorderBrush="#35FFFFFF" BorderThickness="1" Background="#D5111217">
+                            <StackPanel VerticalAlignment="Center" Spacing="6">
+                                <TextBlock Text="{x:Bind Title}" Foreground="White" FontSize="20" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" MaxLines="1" />
+                                <TextBlock Text="{x:Bind Source}" Foreground="#C8FFFFFF" FontSize="15" />
+                            </StackPanel>
+                        </Border>
+                    </DataTemplate>
+                </GridView.ItemTemplate>
+            </GridView>
+            <TextBlock Grid.Row="3" Text="A Adicionar   Y Pesquisar   B Voltar" Foreground="{StaticResource SecondaryTextBrush}" FontSize="16" HorizontalAlignment="Center" Margin="0,14,0,0" />
+        </Grid>
+    </Grid>
+</Page>
+
+
