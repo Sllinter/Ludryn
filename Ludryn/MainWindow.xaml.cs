@@ -49,6 +49,14 @@ public sealed partial class MainWindow : Window
 
     public IntPtr WindowHandle => WindowNative.GetWindowHandle(this);
 
+    public void BringToFront()
+    {
+        var hwnd = WindowHandle;
+        ShowWindow(hwnd, ShowWindowRestore);
+        Activate();
+        SetForegroundWindow(hwnd);
+    }
+
     public MainWindow()
     {
         InitializeComponent();
@@ -124,6 +132,16 @@ public sealed partial class MainWindow : Window
         var appWindow = AppWindow.GetFromWindowId(windowId);
         appWindow.SetPresenter(AppWindowPresenterKind.FullScreen);
     }
+
+    private const int ShowWindowRestore = 9;
+
+    [DllImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
+    [DllImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool SetForegroundWindow(IntPtr hWnd);
 
     private void Root_KeyDown(object sender, KeyRoutedEventArgs e)
     {

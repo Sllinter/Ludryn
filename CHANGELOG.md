@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.4.0 - 2026-06-13
+
+- Impedida a abertura de múltiplas instâncias do Ludryn.
+- Chamadas do Xbox Mode agora ativam e restauram a janela já aberta.
+
 ## 1.0.3.0 - 2026-06-09
 
 - Removida a configuração experimental de ocultar o cursor por inatividade.
