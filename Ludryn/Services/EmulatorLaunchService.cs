@@ -8,6 +8,8 @@ public static class EmulatorLaunchService
 {
     private static readonly ConcurrentDictionary<string, string> RetroArchCoreCache =
         new(StringComparer.OrdinalIgnoreCase);
+    private static readonly ConcurrentDictionary<string, Process> RunningGames =
+        new(StringComparer.OrdinalIgnoreCase);
 
     public static bool IsEmulatorInstallation(Game game, GameInstallation installation) =>
         IsEmulatorPlatform(game.Platform) &&
@@ -136,7 +138,12 @@ public static class EmulatorLaunchService
 
         try
         {
-            Process.Start(startInfo);
+            var process = Process.Start(startInfo);
+            if (process is not null)
+            {
+                TrackRunningGame(installation, process);
+            }
+
             LudrynLogger.Log("emulator", $"Launch: {GetDisplayName(executable)}; Platform={game.Platform}; ROM={romPath}");
             return true;
         }
@@ -149,19 +156,62 @@ public static class EmulatorLaunchService
 
     public static bool IsRunning(GameInstallation installation)
     {
-        if (!File.Exists(installation.LaunchId))
+        var key = GetRunningGameKey(installation);
+        if (!RunningGames.TryGetValue(key, out var process))
         {
             return false;
         }
 
-        var processName = Path.GetFileNameWithoutExtension(installation.LaunchId);
         try
         {
-            return Process.GetProcessesByName(processName).Any();
+            if (!process.HasExited)
+            {
+                return true;
+            }
         }
         catch
         {
-            return false;
+            // Treat inaccessible or disposed processes as no longer running.
+        }
+
+        RunningGames.TryRemove(key, out _);
+        process.Dispose();
+        return false;
+    }
+
+    private static void TrackRunningGame(GameInstallation installation, Process process)
+    {
+        var key = GetRunningGameKey(installation);
+        if (RunningGames.TryGetValue(key, out var previousProcess))
+        {
+            previousProcess.Dispose();
+        }
+
+        RunningGames[key] = process;
+    }
+
+    private static string GetRunningGameKey(GameInstallation installation)
+    {
+        var executable = NormalizePath(installation.LaunchId);
+        var gamePath = NormalizePath(installation.InstallPath);
+        return $"{executable}|{gamePath}";
+    }
+
+    private static string NormalizePath(string path)
+    {
+        if (string.IsNullOrWhiteSpace(path))
+        {
+            return string.Empty;
+        }
+
+        try
+        {
+            return Path.GetFullPath(path)
+                .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+        }
+        catch
+        {
+            return path.Trim();
         }
     }
 

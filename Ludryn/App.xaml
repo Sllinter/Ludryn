@@ -14,6 +14,26 @@
             <SolidColorBrush x:Key="PrimaryAccentBrush" Color="{StaticResource PrimaryAccentColor}" />
             <SolidColorBrush x:Key="PrimaryTextBrush" Color="{StaticResource PrimaryTextColor}" />
             <SolidColorBrush x:Key="SecondaryTextBrush" Color="{StaticResource SecondaryTextColor}" />
+            <SolidColorBrush x:Key="SystemControlFocusVisualPrimaryBrush" Color="Transparent" />
+            <SolidColorBrush x:Key="SystemControlFocusVisualSecondaryBrush" Color="Transparent" />
+            <SolidColorBrush x:Key="ListViewItemBackgroundPointerOver" Color="Transparent" />
+            <SolidColorBrush x:Key="ListViewItemBackgroundSelected" Color="Transparent" />
+            <SolidColorBrush x:Key="ListViewItemBackgroundSelectedPointerOver" Color="Transparent" />
+            <SolidColorBrush x:Key="ListViewItemBackgroundPressed" Color="Transparent" />
+            <SolidColorBrush x:Key="ListViewItemBorderBrushPointerOver" Color="Transparent" />
+            <SolidColorBrush x:Key="ListViewItemBorderBrushSelected" Color="Transparent" />
+            <SolidColorBrush x:Key="ListViewItemBorderBrushSelectedPointerOver" Color="Transparent" />
+            <SolidColorBrush x:Key="ListViewItemRevealBorderBrush" Color="Transparent" />
+            <SolidColorBrush x:Key="ListViewItemRevealBorderBrushPointerOver" Color="Transparent" />
+            <SolidColorBrush x:Key="GridViewItemBackgroundPointerOver" Color="Transparent" />
+            <SolidColorBrush x:Key="GridViewItemBackgroundSelected" Color="Transparent" />
+            <SolidColorBrush x:Key="GridViewItemBackgroundSelectedPointerOver" Color="Transparent" />
+            <SolidColorBrush x:Key="GridViewItemBackgroundPressed" Color="Transparent" />
+            <SolidColorBrush x:Key="GridViewItemBorderBrushPointerOver" Color="Transparent" />
+            <SolidColorBrush x:Key="GridViewItemBorderBrushSelected" Color="Transparent" />
+            <SolidColorBrush x:Key="GridViewItemBorderBrushSelectedPointerOver" Color="Transparent" />
+            <SolidColorBrush x:Key="GridViewItemRevealBorderBrush" Color="Transparent" />
+            <SolidColorBrush x:Key="GridViewItemRevealBorderBrushPointerOver" Color="Transparent" />
             <SolidColorBrush x:Key="TabViewButtonBackground" Color="#101217" />
             <SolidColorBrush x:Key="TabViewButtonBackgroundPointerOver" Color="#1B1A22" />
             <SolidColorBrush x:Key="TabViewButtonBackgroundPressed" Color="#2A1833" />
@@ -36,6 +56,7 @@
                 <Setter Property="FontSize" Value="18" />
                 <Setter Property="FontWeight" Value="SemiBold" />
                 <Setter Property="CornerRadius" Value="8" />
+                <Setter Property="UseSystemFocusVisuals" Value="False" />
             </Style>
 
             <Style x:Key="GameCardButtonStyle" TargetType="Button">
@@ -59,6 +80,7 @@
                 <Setter Property="BorderBrush" Value="Transparent" />
                 <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                 <Setter Property="VerticalContentAlignment" Value="Stretch" />
+                <Setter Property="UseSystemFocusVisuals" Value="False" />
             </Style>
 
             <Style x:Key="FlatGridViewItemStyle" TargetType="GridViewItem">
@@ -70,6 +92,7 @@
                 <Setter Property="BorderBrush" Value="Transparent" />
                 <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                 <Setter Property="VerticalContentAlignment" Value="Stretch" />
+                <Setter Property="UseSystemFocusVisuals" Value="False" />
             </Style>
 
             <Style x:Key="BottomTabButtonStyle" TargetType="Button">
@@ -82,6 +105,7 @@
                 <Setter Property="HorizontalAlignment" Value="Stretch" />
                 <Setter Property="VerticalAlignment" Value="Stretch" />
                 <Setter Property="FontFamily" Value="{StaticResource TextFont}" />
+                <Setter Property="UseSystemFocusVisuals" Value="False" />
             </Style>
 
             <Style x:Key="FilterPillButtonStyle" TargetType="Button">
@@ -94,6 +118,7 @@
                 <Setter Property="MinWidth" Value="190" />
                 <Setter Property="FontSize" Value="18" />
                 <Setter Property="FontWeight" Value="SemiBold" />
+                <Setter Property="UseSystemFocusVisuals" Value="False" />
             </Style>
 
             <Style x:Key="EmulatorSideButtonStyle" TargetType="Button">
@@ -105,6 +130,7 @@
                 <Setter Property="Padding" Value="24,16" />
                 <Setter Property="Height" Value="90" />
                 <Setter Property="HorizontalAlignment" Value="Stretch" />
+                <Setter Property="UseSystemFocusVisuals" Value="False" />
             </Style>
 
             <Style x:Key="SettingsCategoryButtonStyle" TargetType="Button">
@@ -116,6 +142,7 @@
                 <Setter Property="Padding" Value="28,18" />
                 <Setter Property="FontSize" Value="21" />
                 <Setter Property="CornerRadius" Value="8" />
+                <Setter Property="UseSystemFocusVisuals" Value="False" />
             </Style>
 
             <Style x:Key="SettingsRowButtonStyle" TargetType="Button">
@@ -126,6 +153,7 @@
                 <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                 <Setter Property="Padding" Value="0,10" />
                 <Setter Property="MinHeight" Value="68" />
+                <Setter Property="UseSystemFocusVisuals" Value="False" />
             </Style>
         </ResourceDictionary>
     </Application.Resources>

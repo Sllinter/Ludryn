@@ -66,8 +66,8 @@ internal sealed class InstallerForm : Form
                 "1. Atualize o Windows 11.\n" +
                 "2. Execute o Xbox Full Screen Experience Tool para habilitar o FSE/Handheld Mode.\n" +
                 "3. Depois, instale o Ludryn e selecione-o como Xbox Home App.\n\n" +
-                "O FSE já está habilitado neste computador?",
-                "Pré-requisitos do Ludryn",
+                "O FSE ja esta habilitado neste computador?",
+                "Pre-requisitos do Ludryn",
                 MessageBoxButtons.YesNo,
                 MessageBoxIcon.Information);
 
@@ -117,16 +117,77 @@ internal sealed class InstallerForm : Form
             await Task.Run(() => TrustCertificate(certificatePath));
 
             SetStatus("Preparando os componentes do Windows...");
-            await RunPowerShellAsync(
-                $"Add-AppxPackage -Path {Quote(runtimePath)} -ForceUpdateFromAnyVersion");
+            var runtimeCommand = $$"""
+                $requiredVersion = [version]'2.1.3.0';
+                $installedRuntime = Get-AppxPackage -Name 'Microsoft.WindowsAppRuntime.2' |
+                    Where-Object { $_.Architecture -eq 'X64' } |
+                    Sort-Object { [version]$_.Version } -Descending |
+                    Select-Object -First 1;
+                if (-not $installedRuntime -or [version]$installedRuntime.Version -lt $requiredVersion) {
+                    Add-AppxPackage -Path {{Quote(runtimePath)}} -ForceUpdateFromAnyVersion
+                }
+                """;
+            await RunPowerShellAsync(runtimeCommand);
 
             SetStatus("Instalando o Ludryn como Xbox Home App...");
+            var dataBackupPath = Path.Combine(temporaryDirectory, "UserDataBackup");
             var installCommand = $$"""
-                $existing = Get-AppxPackage -Name 'Kauac.Ludryn';
-                if ($existing -and $existing.IsDevelopmentMode) {
-                    Remove-AppxPackage -Package $existing.PackageFullName -PreserveApplicationData
+                $backupRoot = {{Quote(dataBackupPath)}};
+                $externalData = Join-Path $env:LOCALAPPDATA 'Ludryn';
+                $packageLocalState = Join-Path $env:LOCALAPPDATA 'Packages\Kauac.Ludryn_d9yz5w7yexjqp\LocalState';
+
+                function Copy-LudrynDirectory($source, $destination) {
+                    if (-not (Test-Path -LiteralPath $source)) {
+                        return;
+                    }
+
+                    New-Item -ItemType Directory -Force -Path $destination | Out-Null;
+                    Get-ChildItem -LiteralPath $source -Force -ErrorAction SilentlyContinue |
+                        ForEach-Object {
+                            Copy-Item -LiteralPath $_.FullName -Destination $destination -Recurse -Force -ErrorAction Stop;
+                        };
                 }
-                Add-AppxPackage -Path {{Quote(packagePath)}} -ForceApplicationShutdown -ForceUpdateFromAnyVersion;
+
+                function Backup-LudrynData {
+                    New-Item -ItemType Directory -Force -Path $backupRoot | Out-Null;
+                    Copy-LudrynDirectory $externalData (Join-Path $backupRoot 'ExternalData');
+                    Copy-LudrynDirectory $packageLocalState (Join-Path $backupRoot 'PackageLocalState');
+                }
+
+                function Restore-LudrynData {
+                    Copy-LudrynDirectory (Join-Path $backupRoot 'ExternalData') $externalData;
+                    Copy-LudrynDirectory (Join-Path $backupRoot 'PackageLocalState') $packageLocalState;
+                }
+
+                Backup-LudrynData;
+                Get-Process -Name 'Ludryn' -ErrorAction SilentlyContinue |
+                    Stop-Process -Force -ErrorAction SilentlyContinue;
+
+                try {
+                    Add-AppxPackage -Path {{Quote(packagePath)}} -ForceApplicationShutdown -ForceUpdateFromAnyVersion -ErrorAction Stop;
+                }
+                catch {
+                    $installError = $_;
+                    $existing = Get-AppxPackage -Name 'Kauac.Ludryn';
+                    if (-not $existing) {
+                        throw $installError;
+                    }
+
+                    try {
+                        Remove-AppxPackage -Package $existing.PackageFullName -PreserveApplicationData -ErrorAction Stop;
+                    }
+                    catch {
+                        $remaining = Get-AppxPackage -Name 'Kauac.Ludryn';
+                        if ($remaining) {
+                            Remove-AppxPackage -Package $remaining.PackageFullName -ErrorAction Stop;
+                        }
+                    }
+
+                    Restore-LudrynData;
+                    Add-AppxPackage -Path {{Quote(packagePath)}} -ForceApplicationShutdown -ForceUpdateFromAnyVersion -ErrorAction Stop;
+                }
+
+                Restore-LudrynData;
                 if (-not (Get-AppxPackage -Name 'Kauac.Ludryn')) {
                     throw 'O Windows nao confirmou a instalacao do Ludryn.'
                 }
@@ -222,14 +283,14 @@ internal sealed class InstallerForm : Form
     {
         var encodedCommand = Convert.ToBase64String(
             System.Text.Encoding.Unicode.GetBytes(
-                "$ErrorActionPreference='Stop';" + command));
+                "$ErrorActionPreference='Stop';$ProgressPreference='SilentlyContinue';" + command));
 
         using var process = new Process
         {
             StartInfo = new ProcessStartInfo
             {
                 FileName = "powershell.exe",
-                Arguments = $"-NoProfile -NonInteractive -EncodedCommand {encodedCommand}",
+                Arguments = $"-NoProfile -NonInteractive -OutputFormat Text -EncodedCommand {encodedCommand}",
                 UseShellExecute = false,
                 CreateNoWindow = true,
                 RedirectStandardOutput = true,
@@ -246,8 +307,45 @@ internal sealed class InstallerForm : Form
 
         if (process.ExitCode != 0)
         {
-            throw new InvalidOperationException(
-                string.IsNullOrWhiteSpace(error) ? output : error);
+            throw new InvalidOperationException(GetReadablePowerShellError(error, output));
+        }
+    }
+
+    private static string GetReadablePowerShellError(string error, string output)
+    {
+        var message = string.IsNullOrWhiteSpace(error) ? output : error;
+        if (!message.Contains("#< CLIXML", StringComparison.OrdinalIgnoreCase))
+        {
+            return message.Trim();
+        }
+
+        try
+        {
+            var xmlStart = message.IndexOf("<Objs", StringComparison.OrdinalIgnoreCase);
+            if (xmlStart < 0)
+            {
+                return "O Windows recusou a instalacao. Consulte os logs do instalador.";
+            }
+
+            var document = System.Xml.Linq.XDocument.Parse(message[xmlStart..]);
+            var lines = document
+                .Descendants()
+                .Where(element => element.Name.LocalName is "S" or "ToString")
+                .Select(element => System.Net.WebUtility.HtmlDecode(element.Value))
+                .Select(value => value
+                    .Replace("_x000D_", string.Empty, StringComparison.OrdinalIgnoreCase)
+                    .Replace("_x000A_", Environment.NewLine, StringComparison.OrdinalIgnoreCase))
+                .Where(value => !string.IsNullOrWhiteSpace(value))
+                .Distinct()
+                .ToList();
+
+            return lines.Count > 0
+                ? string.Join(Environment.NewLine, lines).Trim()
+                : "O Windows recusou a instalacao. Consulte os logs do instalador.";
+        }
+        catch
+        {
+            return "O Windows recusou a instalacao. Consulte os logs do instalador.";
         }
     }
 

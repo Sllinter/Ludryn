@@ -25,7 +25,7 @@ public sealed partial class SettingsPage : Page, IGamepadFocusablePage, IGamepad
     {
         InitializeComponent();
         NavigationCacheMode = NavigationCacheMode.Required;
-        _categoryButtons = [GeneralCategoryButton, LibraryCategoryButton, SteamGridDbCategoryButton];
+        _categoryButtons = [GeneralCategoryButton, LibraryCategoryButton, SteamGridDbCategoryButton, AboutCategoryButton];
         ShowCategory(0);
     }
 
@@ -33,6 +33,7 @@ public sealed partial class SettingsPage : Page, IGamepadFocusablePage, IGamepad
     {
         _dataService = e.Parameter as MockDataService;
         SteamGridDbApiKeyBox.Password = SteamGridDbService.TryReadApiKey(out _) ?? string.Empty;
+        AppVersionText.Text = GetAppVersion();
         UpdateApiStatus();
         RefreshGameDirectories();
         _isCategoryNavigation = true;
@@ -196,6 +197,7 @@ public sealed partial class SettingsPage : Page, IGamepadFocusablePage, IGamepad
         GeneralPanel.Visibility = _categoryIndex == 0 ? Visibility.Visible : Visibility.Collapsed;
         LibraryPanel.Visibility = _categoryIndex == 1 ? Visibility.Visible : Visibility.Collapsed;
         SteamGridDbPanel.Visibility = _categoryIndex == 2 ? Visibility.Visible : Visibility.Collapsed;
+        AboutPanel.Visibility = _categoryIndex == 3 ? Visibility.Visible : Visibility.Collapsed;
 
         _actionButtons.Clear();
         if (_categoryIndex == 0)
@@ -208,7 +210,7 @@ public sealed partial class SettingsPage : Page, IGamepadFocusablePage, IGamepad
             _actionButtons.Add(AddGameDirectoryButton);
             _actionButtons.AddRange(GameDirectoriesPanel.Children.OfType<Button>());
         }
-        else
+        else if (_categoryIndex == 2)
         {
             _actionButtons.AddRange([ApiKeyEditButton, RevealApiKeyButton, PasteApiKeyButton, CreateApiKeyButton]);
         }
@@ -216,6 +218,22 @@ public sealed partial class SettingsPage : Page, IGamepadFocusablePage, IGamepad
         _actionIndex = Math.Clamp(_actionIndex, 0, Math.Max(0, _actionButtons.Count - 1));
         UpdateCategoryVisuals();
         UpdateActionVisuals();
+    }
+
+    private static string GetAppVersion()
+    {
+        try
+        {
+            var version = Windows.ApplicationModel.Package.Current.Id.Version;
+            return $"{version.Major}.{version.Minor}.{version.Build}.{version.Revision}";
+        }
+        catch
+        {
+            var version = typeof(App).Assembly.GetName().Version;
+            return version is null
+                ? "Desconhecida"
+                : $"{version.Major}.{version.Minor}.{version.Build}.{version.Revision}";
+        }
     }
 
     private void StartupPage_Click(object sender, RoutedEventArgs e)

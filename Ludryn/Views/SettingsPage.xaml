@@ -28,6 +28,7 @@
                         <Button x:Name="GeneralCategoryButton" Content="Geral" Click="Category_Click" Tag="0" Height="74" Style="{StaticResource SettingsCategoryButtonStyle}" />
                         <Button x:Name="LibraryCategoryButton" Content="Biblioteca" Click="Category_Click" Tag="1" Height="74" Style="{StaticResource SettingsCategoryButtonStyle}" />
                         <Button x:Name="SteamGridDbCategoryButton" Content="SteamGridDB" Click="Category_Click" Tag="2" Height="74" Style="{StaticResource SettingsCategoryButtonStyle}" />
+                        <Button x:Name="AboutCategoryButton" Content="Sobre o app" Click="Category_Click" Tag="3" Height="74" Style="{StaticResource SettingsCategoryButtonStyle}" />
                     </StackPanel>
                 </Border>
 
@@ -91,6 +92,29 @@
                                     <Button x:Name="CreateApiKeyButton" Grid.Column="3" Click="CreateApiKey_Click" Content="Criar" Height="64" FontSize="18" />
                                 </Grid>
                                 <TextBlock x:Name="SteamGridDbStatusText" Foreground="{StaticResource SecondaryTextBrush}" FontSize="16" TextWrapping="WrapWholeWords" />
+                            </StackPanel>
+                        </Grid>
+
+                        <Grid x:Name="AboutPanel" Visibility="Collapsed">
+                            <StackPanel Spacing="22">
+                                <StackPanel Spacing="4">
+                                    <TextBlock Text="Sobre o app" Foreground="#F2C98E" FontFamily="Georgia" FontSize="38" FontWeight="Bold" />
+                                    <TextBlock Text="Informacoes da instalacao atual do Ludryn." Foreground="{StaticResource SecondaryTextBrush}" FontSize="16" />
+                                </StackPanel>
+
+                                <Border CornerRadius="8" Background="#4A151821" BorderBrush="#35FFFFFF" BorderThickness="1" Padding="24,20">
+                                    <Grid ColumnSpacing="24">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Spacing="4">
+                                            <TextBlock Text="Versao atual" Foreground="White" FontSize="22" FontWeight="SemiBold" />
+                                            <TextBlock Text="Use essa informacao para conferir updates e releases." Foreground="{StaticResource SecondaryTextBrush}" FontSize="15" />
+                                        </StackPanel>
+                                        <TextBlock x:Name="AppVersionText" Grid.Column="1" Foreground="#D875F0" FontSize="24" FontWeight="SemiBold" VerticalAlignment="Center" />
+                                    </Grid>
+                                </Border>
                             </StackPanel>
                         </Grid>
                     </Grid>

@@ -24,6 +24,7 @@ public sealed class MockDataService
     public MockDataService()
     {
         _preferencesService = new LibraryPreferencesService(_profileService);
+        _customGames.AddRange(CustomGameService.GetGames().Select(CreateCustomGame));
         _customStores.AddRange(StoreLauncherService.GetCustomStores());
 
         SteamGridDbMessage = SteamGridDbService.TryReadApiKey(out var message) is not null
@@ -463,17 +464,15 @@ public sealed class MockDataService
 
     public Game AddCustomGame(string title, string executablePath = "", string arguments = "", string platform = "PC")
     {
-        var game = Create($"custom-game-{Guid.NewGuid():N}", title, platform, "Adicionado", 0);
-        game.Installations.Clear();
-        game.Installations.Add(new GameInstallation
+        var config = CustomGameService.Add(title, executablePath, arguments, platform);
+        var game = _customGames.FirstOrDefault(item =>
+            string.Equals(item.Id, config.Id, StringComparison.OrdinalIgnoreCase));
+        if (game is null)
         {
-            Launcher = platform,
-            LaunchId = executablePath,
-            InstallPath = Path.GetDirectoryName(executablePath) ?? string.Empty,
-            LaunchArguments = arguments,
-            IsDetected = false
-        });
-        _customGames.Add(game);
+            game = CreateCustomGame(config);
+            _customGames.Add(game);
+        }
+
         LibraryVersion++;
         NotifyArtworkProgressChanged();
         return game;
@@ -511,6 +510,7 @@ public sealed class MockDataService
     public void RemoveGame(Game game)
     {
         _preferencesService.Hide(game);
+        CustomGameService.Remove(game.Id);
         var removedStore = false;
         if (game.IsStoreEntry)
         {
@@ -815,6 +815,26 @@ public sealed class MockDataService
             IsDetected = false
         });
         game.SelectedLauncher = platform;
+        return game;
+    }
+
+    private static Game CreateCustomGame(CustomGameConfig config)
+    {
+        var game = Create(config.Id, config.Title, config.Platform, "Adicionado", 0);
+        game.AddedAt = config.AddedAt == default ? DateTime.Now : config.AddedAt;
+        game.Installations.Clear();
+        game.Installations.Add(new GameInstallation
+        {
+            Launcher = config.Platform,
+            LaunchId = config.ExecutablePath,
+            InstallPath = Path.GetDirectoryName(config.ExecutablePath) ?? string.Empty,
+            LaunchArguments = config.Arguments,
+            IsDetected = false
+        });
+        game.SelectedLauncher = config.Platform;
+        game.PlatformIcon = ApplicationIconService.LoadCachedIcon(
+            ApplicationIconService.GetCachedIconPath(config.ExecutablePath))
+            ?? PlatformIconService.GetIcon(config.Platform);
         return game;
     }
 }
