@@ -50,8 +50,30 @@ if "%COMMIT_MESSAGE%"=="" (
     set "COMMIT_MESSAGE=Atualiza Ludryn"
 )
 
+for /f "tokens=*" %%v in ('powershell -NoProfile -Command "([xml](Get-Content -Raw 'Ludryn\\Package.appxmanifest')).Package.Identity.Version"') do set "APP_VERSION=%%v"
+if "%APP_VERSION%"=="" (
+    set "APP_VERSION=sem-versao"
+)
+
+echo.
+echo Registro do CHANGELOG.md
+echo Versao detectada: %APP_VERSION%
+set "CHANGELOG_ENTRY="
+set /p CHANGELOG_ENTRY=O que mudou nesta versao: 
+if "%CHANGELOG_ENTRY%"=="" (
+    echo E necessario informar uma mensagem para o CHANGELOG.md.
+    pause
+    exit /b 1
+)
+
+set "LUDRYN_CHANGELOG_VERSION=%APP_VERSION%"
+set "LUDRYN_CHANGELOG_ENTRY=%CHANGELOG_ENTRY%"
+powershell -NoProfile -ExecutionPolicy Bypass -Command "$path='CHANGELOG.md'; $version=$env:LUDRYN_CHANGELOG_VERSION; $entry=$env:LUDRYN_CHANGELOG_ENTRY; $date=Get-Date -Format 'yyyy-MM-dd'; $content=''; if (Test-Path $path) { $content=Get-Content -LiteralPath $path -Raw -Encoding UTF8 }; $body=$content -replace '^\s*# Changelog\s*\r?\n\r?\n',''; if ($body -notmatch ('(?m)^##\s+' + [regex]::Escape($version) + '\b')) { $new = '# Changelog' + \"`r`n`r`n\" + '## ' + $version + ' - ' + $date + \"`r`n`r`n\" + '- ' + $entry + \"`r`n`r`n\" + $body.TrimStart(); Set-Content -LiteralPath $path -Value $new -Encoding UTF8 } else { $lines = $content -split \"`r?`n\"; $index = [Array]::FindIndex($lines, [Predicate[string]]{ param($line) $line -match ('^##\s+' + [regex]::Escape($version) + '\b') }); if ($index -ge 0) { $insert = $index + 2; $list = [System.Collections.Generic.List[string]]::new(); $list.AddRange([string[]]$lines); $list.Insert($insert, '- ' + $entry); Set-Content -LiteralPath $path -Value ($list -join \"`r`n\") -Encoding UTF8 } }"
+if errorlevel 1 goto :erro
+
 echo.
 echo O script vai executar:
+echo   atualizar CHANGELOG.md
 echo   git add -A
 echo   git commit -m "%COMMIT_MESSAGE%"
 echo   git push origin %CURRENT_BRANCH%
